@@ -1,0 +1,21 @@
+{
+    "name": "anourvalar/config-helper",
+    "description": "Helper functions over Laravel config",
+    "keywords": ["laravel", "config", "anourvalar"],
+    "homepage": "https://github.com/AnourValar/config-helper",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0.0",
+        "laravel/framework": ">=5.5.0"
+    },
+    "autoload": {
+        "psr-4": {"AnourValar\\ConfigHelper\\": "src/"}
+    },
+    "extra": {
+        "laravel": {
+            "aliases": {
+                "ConfigHelper": "AnourValar\\ConfigHelper\\Facades\\ConfigHelperFacade"
+            }
+        }
+    }
+}
