@@ -19,8 +19,8 @@ class ConfigHelper
     public function toSelect(
         $data,
         $selected = null,
-        ?array $conditions = [],
-        ?array $prepends = [],
+        array $conditions = null,
+        array $prepends = null,
         $value = null,
         $title = 'title',
         $optgroup = 'optgroup'
@@ -41,7 +41,7 @@ class ConfigHelper
                 $curr = $key;
             }
 
-            if (!in_array($curr, $selected) && !$this->conditionsPasses($conditions, $item)) {
+            if (!in_array($curr, $selected) && !$this->conditionsPasses($conditions, $item, $curr)) {
                 continue;
             }
 
@@ -70,7 +70,7 @@ class ConfigHelper
 
         $result = [];
         foreach ($config as $key => $value) {
-            if (!$this->conditionsPasses($conditions, $value)) {
+            if (!$this->conditionsPasses($conditions, $value, $key)) {
                 continue;
             }
 
@@ -127,16 +127,23 @@ class ConfigHelper
      *
      * @param array $conditions
      * @param mixed $item
+     * @param mixed $key
      * @return boolean
      */
-    public function conditionsPasses(?array $conditions, $item) : bool
+    public function conditionsPasses(?array $conditions, $item, $key) : bool
     {
         foreach ((array)$conditions as $field => $value) {
-            if ($value && (empty($item[$field]) || !array_intersect((array)$item[$field], (array)$value))) {
+            if (is_numeric($field)) {
+                $curr = $key;
+            } else {
+                $curr = $item[$field] ?? null;
+            }
+
+            if ($value && (empty($curr) || !array_intersect((array)$curr, (array)$value))) {
                 return false;
             }
 
-            if (!$value && !empty($item[$field])) {
+            if (!$value && !empty($curr)) {
                 return false;
             }
         }
