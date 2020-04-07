@@ -62,7 +62,7 @@ class ConfigHelper
      * @param array $conditions
      * @return array
      */
-    public function getKeys($config, ?array $conditions = []) : array
+    public function keys($config, ?array $conditions = []) : array
     {
         if (is_string($config)) {
             $config = config($config);
@@ -89,9 +89,9 @@ class ConfigHelper
      * @throws \Exception
      * @return mixed
      */
-    public function getKey($config, ?array $conditions = [], bool $strict = true)
+    public function key($config, ?array $conditions = [], bool $strict = true)
     {
-        $result = $this->getKeys($config, $conditions);
+        $result = $this->keys($config, $conditions);
 
         if ($strict && count($result) != 1) {
             throw new \Exception('Required key must be singleton.');
@@ -139,13 +139,23 @@ class ConfigHelper
                 $curr = $item[$field] ?? null;
             }
 
-            if ($value && (empty($curr) || !array_intersect((array)$curr, (array)$value))) {
-                return false;
+            if ($value === true && $curr) {
+                continue;
             }
 
-            if (!$value && !empty($curr)) {
-                return false;
+            if ($value === false && ($curr === false || $curr === null || (is_array($curr) && !count($curr)))) {
+                continue;
             }
+
+            if ($value === null && !isset($curr)) {
+                continue;
+            }
+
+            if (array_intersect((array)$curr, (array)$value)) {
+                continue;
+            }
+
+            return false;
         }
 
         return true;
