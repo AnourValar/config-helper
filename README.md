@@ -1,3 +1,12 @@
+# Laravel Config Helpers
+
+## Installation
+
+```bash
+composer require anourvalar/config-helper
+```
+
+
 ## Usage
 
 ### Config example
@@ -14,12 +23,14 @@ return [
 ];
 ```
 
+
 ### Get filtered keys of config
 ```php
-\ConfigHelper::getKeys('example.user_role', ['super_user' => true]); // ['admin', 'maintainer']
+\ConfigHelper::keys('example.user_role', ['super_user' => true]); // ['admin', 'maintainer']
 ```
+
 
 ### Get singleton key
 ```php
-\ConfigHelper::getKey('example.user_role', ['register_via_form' => true]); // 'user'
+\ConfigHelper::key('example.user_role', ['register_via_form' => true]); // 'user'
 ```
