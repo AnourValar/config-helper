@@ -86,7 +86,7 @@ class ConfigHelper
      * @param mixed $config
      * @param array $conditions
      * @param boolean $strict
-     * @throws \Exception
+     * @throws \LogicException
      * @return mixed
      */
     public function key($config, ?array $conditions = [], bool $strict = true)
@@ -94,7 +94,7 @@ class ConfigHelper
         $result = $this->keys($config, $conditions);
 
         if ($strict && count($result) != 1) {
-            throw new \Exception('Required key must be singleton.');
+            throw new \LogicException('Required key must be single.');
         }
 
         return $result[0] ?? null;
