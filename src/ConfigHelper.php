@@ -8,9 +8,9 @@ class ConfigHelper
      * Gets prepared list for Form::select()
      *
      * @param mixed $data
-     * @param mixed $selected
-     * @param array $conditions
      * @param array $prepends
+     * @param array $conditions
+     * @param mixed $excludes
      * @param mixed $value
      * @param string $title
      * @param string $optgroup
@@ -18,9 +18,9 @@ class ConfigHelper
      */
     public function toSelect(
         $data,
-        $selected = null,
-        array $conditions = null,
         array $prepends = null,
+        array $conditions = null,
+        $excludes = null,
         $value = null,
         $title = 'title',
         $optgroup = 'optgroup'
@@ -28,7 +28,7 @@ class ConfigHelper
         if (is_string($data)) {
             $data = config($data);
         }
-        $selected = (array)$selected;
+        $excludes = (array)$excludes;
 
         $result = (array)$prepends;
 
@@ -41,7 +41,7 @@ class ConfigHelper
                 $curr = $key;
             }
 
-            if (!in_array($curr, $selected) && !$this->conditionsPasses($conditions, $item, $curr)) {
+            if (!in_array($curr, $excludes) && !$this->conditionsPasses($conditions, $item, $curr)) {
                 continue;
             }
 
