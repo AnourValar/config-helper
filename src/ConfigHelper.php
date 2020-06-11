@@ -101,6 +101,18 @@ class ConfigHelper
     }
 
     /**
+     * Gets first key of config
+     *
+     * @param mixed $config
+     * @param array $conditions
+     * @return mixed
+     */
+    public function firstKey($config, ?array $conditions = [])
+    {
+        return $this->key($config, $conditions, false);
+    }
+
+    /**
      * Gets config with localized titles
      *
      * @param mixed $config
