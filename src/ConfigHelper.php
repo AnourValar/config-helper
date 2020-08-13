@@ -5,7 +5,7 @@ namespace AnourValar\ConfigHelper;
 class ConfigHelper
 {
     /**
-     * Gets prepared list for Form::select()
+     * Prepares data for select's options
      *
      * @param mixed $data
      * @param array $prepends
@@ -14,34 +14,34 @@ class ConfigHelper
      * @param mixed $value
      * @param string $title
      * @param string $optgroup
-     * @return array
+     * @return SelectOptions
      */
     public function toSelect(
         $data,
         array $prepends = null,
         array $conditions = null,
-        $excludes = null,
+        $selected = null,
         $value = null,
         $title = 'title',
         $optgroup = 'optgroup'
-    ) : array {
+    ): SelectOptions {
         if (is_string($data)) {
             $data = config($data);
         }
-        $excludes = (array)$excludes;
+        $selected = (array)$selected;
 
         $result = (array)$prepends;
 
         foreach ($data as $key => $item) {
             if (!is_null($value)) {
                 $curr = $item[$value];
-            } else if ($item instanceof \Illuminate\Database\Eloquent\Model) {
+            } elseif ($item instanceof \Illuminate\Database\Eloquent\Model) {
                 $curr = $item[$item->getKeyName()];
             } else {
                 $curr = $key;
             }
 
-            if (!in_array($curr, $excludes) && !$this->conditionsPasses($conditions, $item, $curr)) {
+            if (!in_array($curr, $selected) && !$this->conditionsPasses($conditions, $item, $curr)) {
                 continue;
             }
 
@@ -52,7 +52,7 @@ class ConfigHelper
             }
         }
 
-        return $result;
+        return new SelectOptions($result, $selected);
     }
 
     /**
@@ -62,7 +62,7 @@ class ConfigHelper
      * @param array $conditions
      * @return array
      */
-    public function keys($config, ?array $conditions = []) : array
+    public function keys($config, ?array $conditions = []): array
     {
         if (is_string($config)) {
             $config = config($config);
@@ -142,7 +142,7 @@ class ConfigHelper
      * @param mixed $key
      * @return boolean
      */
-    public function conditionsPasses(?array $conditions, $item, $key) : bool
+    public function conditionsPasses(?array $conditions, $item, $key): bool
     {
         foreach ((array)$conditions as $field => $value) {
             if (is_numeric($field)) {
@@ -180,7 +180,7 @@ class ConfigHelper
      * @param integer $level
      * @return array
      */
-    private function localizeRecursive(array $config, array $transKeys, $visibleKeys, int $level = 1) : array
+    private function localizeRecursive(array $config, array $transKeys, $visibleKeys, int $level = 1): array
     {
         foreach ($config as $key => &$item) {
             if ($level == 2 && !in_array($key, $visibleKeys, true)) {
@@ -190,7 +190,7 @@ class ConfigHelper
 
             if (is_array($item)) {
                 $item = $this->localizeRecursive($item, $transKeys, $visibleKeys, ($level + 1));
-            } else if (in_array($key, $transKeys, true) && is_string($item)) {
+            } elseif (in_array($key, $transKeys, true) && is_string($item)) {
                 $item = trans($item);
             }
         }
