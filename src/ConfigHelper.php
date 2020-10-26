@@ -163,7 +163,9 @@ class ConfigHelper
                 continue;
             }
 
-            if (array_intersect((array)$curr, (array)$value)) {
+            $curr = (array)$curr;
+            $value = (array)$value;
+            if (array_intersect(array_keys($curr), $value) || array_intersect($curr, $value)) {
                 continue;
             }
 
