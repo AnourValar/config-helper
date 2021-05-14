@@ -28,7 +28,11 @@ class ConfigHelper
         if (is_string($data)) {
             $data = config($data);
         }
-        $selected = (array)$selected;
+        $selected = (array) $selected;
+        foreach ($selected as &$item) {
+            $item = (string) $item;
+        }
+        unset($item);
 
         $result = (array)$prepends;
 
@@ -41,7 +45,7 @@ class ConfigHelper
                 $curr = $key;
             }
 
-            if (!in_array($curr, $selected) && !$this->conditionsPasses($conditions, $item, $curr)) {
+            if (!in_array((string) $curr, $selected, true) && !$this->conditionsPasses($conditions, $item, $curr)) {
                 continue;
             }
 

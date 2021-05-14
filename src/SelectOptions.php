@@ -109,7 +109,7 @@ class SelectOptions implements \Iterator
     protected function wrapOption($key, $value): string
     {
         $selected = '';
-        if (in_array($key, $this->selected)) {
+        if (in_array((string) $key, $this->selected, true)) {
             $selected = ' selected="selected"';
         }
 
