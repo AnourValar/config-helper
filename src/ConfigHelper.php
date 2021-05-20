@@ -10,10 +10,12 @@ class ConfigHelper
      * @param mixed $data
      * @param array $prepends
      * @param array $conditions
-     * @param mixed $excludes
-     * @param mixed $value
-     * @param string $title
-     * @param string $optgroup
+     * @param mixed $selected
+     * @param string $keyValue
+     * @param string $keyTitle
+     * @param string $keyOptgroup
+     * @param string $keyAttributes
+     * @param string $keyActual
      * @return SelectOptions
      */
     public function toSelect(
@@ -21,9 +23,11 @@ class ConfigHelper
         array $prepends = null,
         array $conditions = null,
         $selected = null,
-        $value = null,
-        $title = 'title',
-        $optgroup = 'optgroup'
+        string $keyValue = null,
+        ?string $keyTitle = 'title',
+        ?string $keyOptgroup = 'optgroup',
+        ?string $keyAttributes = 'attributes',
+        ?string $keyActual = 'is_actual'
     ): SelectOptions {
         if (is_string($data)) {
             $data = config($data);
@@ -37,22 +41,37 @@ class ConfigHelper
         $result = (array)$prepends;
 
         foreach ($data as $key => $item) {
-            if (!is_null($value)) {
-                $curr = $item[$value];
+            if (!is_null($keyValue)) {
+                $curr = $item[$keyValue];
             } elseif ($item instanceof \Illuminate\Database\Eloquent\Model) {
                 $curr = $item[$item->getKeyName()];
             } else {
                 $curr = $key;
             }
 
-            if (!in_array((string) $curr, $selected, true) && !$this->conditionsPasses($conditions, $item, $curr)) {
-                continue;
+            if (!in_array((string) $curr, $selected, true)) {
+                if (! $this->conditionsPasses($conditions, $item, $curr)) {
+                    continue;
+                }
+
+                if ($keyActual && isset($item[$keyActual]) && !$item[$keyActual]) {
+                    continue;
+                }
             }
 
-            if (isset($item[$optgroup])) {
-                $result[trans($item[$optgroup])][$curr] = trans($item[$title]);
+            if ($keyAttributes && isset($item[$keyAttributes])) {
+                $option = [
+                    'title' => trans($item[$keyTitle]),
+                    'attributes' => $item[$keyAttributes],
+                ];
             } else {
-                $result[$curr] = trans($item[$title]);
+                $option = trans($item[$keyTitle]);
+            }
+
+            if ($keyOptgroup && isset($item[$keyOptgroup])) {
+                $result[trans($item[$keyOptgroup])][$curr] = $option;
+            } else {
+                $result[$curr] = $option;
             }
         }
 
