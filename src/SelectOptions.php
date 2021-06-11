@@ -108,7 +108,7 @@ class SelectOptions implements \Iterator
      */
     protected function wrapOption($key, $value): string
     {
-        if (is_string($value)) {
+        if (is_scalar($value)) {
             $value = [
                 'title' => $value,
                 'attributes' => [],
