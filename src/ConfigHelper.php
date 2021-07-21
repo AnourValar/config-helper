@@ -11,69 +11,38 @@ class ConfigHelper
      * @param array $prepends
      * @param array $conditions
      * @param mixed $selected
-     * @param string $keyValue
-     * @param string $keyTitle
-     * @param string $keyOptgroup
-     * @param string $keyAttributes
-     * @param string $keyActual
-     * @return SelectOptions
+     * @param array $keys
+     * @return \AnourValar\ConfigHelper\SelectOptions
      */
     public function toSelect(
         $data,
         array $prepends = null,
         array $conditions = null,
         $selected = null,
-        string $keyValue = null,
-        ?string $keyTitle = 'title',
-        ?string $keyOptgroup = 'optgroup',
-        ?string $keyAttributes = 'attributes',
-        ?string $keyActual = 'is_actual'
+        array $keys = null
     ): SelectOptions {
+        // data prepares
         if (is_string($data)) {
             $data = config($data);
         }
+
+        // selected prepares
         $selected = (array) $selected;
         foreach ($selected as &$item) {
             $item = (string) $item;
         }
         unset($item);
 
-        $result = (array)$prepends;
+        // keys prepares
+        $defaultKeys = [
+            'value' => null, 'title' => 'title', 'optgroup' => 'optgroup', 'attributes' => 'attributes', 'is_actual' => 'is_actual'
+        ];
+        $keys = array_replace($defaultKeys, (array) $keys);
 
-        foreach ($data as $key => $item) {
-            if (!is_null($keyValue)) {
-                $curr = $item[$keyValue];
-            } elseif ($item instanceof \Illuminate\Database\Eloquent\Model) {
-                $curr = $item[$item->getKeyName()];
-            } else {
-                $curr = $key;
-            }
-
-            if (!in_array((string) $curr, $selected, true)) {
-                if (! $this->conditionsPasses($conditions, $item, $curr)) {
-                    continue;
-                }
-
-                if ($keyActual && isset($item[$keyActual]) && !$item[$keyActual]) {
-                    continue;
-                }
-            }
-
-            if ($keyAttributes && isset($item[$keyAttributes])) {
-                $option = [
-                    'title' => trans($item[$keyTitle]),
-                    'attributes' => $item[$keyAttributes],
-                ];
-            } else {
-                $option = trans($item[$keyTitle]);
-            }
-
-            if ($keyOptgroup && isset($item[$keyOptgroup])) {
-                $result[trans($item[$keyOptgroup])][$curr] = $option;
-            } else {
-                $result[$curr] = $option;
-            }
-        }
+        // Handle
+        $result = [];
+        $this->buildSelect($result, (array) $prepends, [], [], $defaultKeys);
+        $this->buildSelect($result, $data, $conditions, $selected, $keys);
 
         return new SelectOptions($result, $selected);
     }
@@ -196,6 +165,45 @@ class ConfigHelper
         }
 
         return true;
+    }
+
+    /**
+     * @param array $result
+     * @param iterable $data
+     * @param array $conditions
+     * @param array $selected
+     * @param array $keys
+     * @return void
+     */
+    private function buildSelect(array &$result, iterable $data, ?array $conditions, array $selected, array $keys): void
+    {
+        foreach ($data as $key => $item) {
+            if ($keys['value']) {
+                $value = $item[$keys['value']];
+            } elseif ($item instanceof \Illuminate\Database\Eloquent\Model) {
+                $value = $item[$item->getKeyName()];
+            } else {
+                $value = $key;
+            }
+
+            if (! in_array((string) $value, $selected, true)) {
+                if (! $this->conditionsPasses($conditions, $item, $value)) {
+                    continue;
+                }
+
+                if ($keys['is_actual'] && isset($item[$keys['is_actual']]) && !$item[$keys['is_actual']]) {
+                    continue;
+                }
+            }
+
+            $option = ['title' => trans($item[$keys['title']]), 'attributes' => ($item[$keys['attributes']] ?? [])];
+
+            if ($keys['optgroup'] && isset($item[$keys['optgroup']])) {
+                $result[trans($item[$keys['optgroup']])][$value] = $option;
+            } else {
+                $result[$value] = $option;
+            }
+        }
     }
 
     /**

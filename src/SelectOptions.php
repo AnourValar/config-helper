@@ -47,7 +47,7 @@ class SelectOptions implements \Iterator
         $html = '';
 
         foreach ($this->data as $key => $value) {
-            if (!is_array($value) || (isset($value['title'], $value['attributes']) && is_array($value['attributes']))) {
+            if (isset($value['title'], $value['attributes']) && is_scalar($value['title']) && is_array($value['attributes'])) {
                 $html .= $this->wrapOption($key, $value);
             } else {
                 $html .= '<optgroup label="' . e($key) . '">';
@@ -70,11 +70,26 @@ class SelectOptions implements \Iterator
     }
 
     /**
+     * Compatibility with laravelcollective/html
+     *
      * @see \Iterator
      */
     public function current()
     {
-        return $this->data[$this->keys[$this->position]];
+        $item = $this->data[$this->keys[$this->position]];
+
+        // flat
+        if (isset($item['title'], $item['attributes']) && is_scalar($item['title']) && is_array($item['attributes'])) {
+            return $item['title'];
+        }
+
+        // optgroup
+        foreach ($item as &$value) {
+            $value = $value['title'];
+        }
+        unset($value);
+
+        return $item;
     }
 
     /**
@@ -102,32 +117,25 @@ class SelectOptions implements \Iterator
     }
 
     /**
-     * @param mixed $key
      * @param mixed $value
+     * @param array $option
      * @return string
      */
-    protected function wrapOption($key, $value): string
+    protected function wrapOption($value, array $option): string
     {
-        if (is_scalar($value)) {
-            $value = [
-                'title' => $value,
-                'attributes' => [],
-            ];
+        $option['attributes']['value'] = $value;
+
+        if (in_array((string) $value, $this->selected, true)) {
+            $option['attributes']['selected'] = 'selected';
         }
 
-        $value['attributes']['value'] = $key;
-
-        if (in_array((string) $key, $this->selected, true)) {
-            $value['attributes']['selected'] = 'selected';
-        }
-
-        foreach ($value['attributes'] as $attributeName => &$attributeValue) {
+        foreach ($option['attributes'] as $attributeName => &$attributeValue) {
             $attributeValue = sprintf('%s="%s"', $attributeName, e($attributeValue));
         }
         unset($attributeValue);
 
-        $value['title'] = e($value['title']);
+        $option['title'] = e($option['title']);
 
-        return sprintf('<option %s>%s</option>', implode(' ', $value['attributes']), e($value['title']));
+        return sprintf('<option %s>%s</option>', implode(' ', $option['attributes']), e($option['title']));
     }
 }
