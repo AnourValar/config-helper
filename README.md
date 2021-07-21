@@ -34,3 +34,9 @@ return [
 ```php
 \ConfigHelper::key('example.user_role', ['register_via_form' => true]); // 'user'
 ```
+
+
+### HTML select
+```php
+echo '<select>' . \ConfigHelper::toSelect('example.user_role') . '</select>';
+```
