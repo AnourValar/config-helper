@@ -11,7 +11,7 @@ class ConfigHelper
      * @param array $prepends
      * @param array $conditions
      * @param mixed $selected
-     * @param array $keys
+     * @param array $mapping
      * @return \AnourValar\ConfigHelper\SelectOptions
      */
     public function toSelect(
@@ -19,7 +19,7 @@ class ConfigHelper
         array $prepends = null,
         array $conditions = null,
         $selected = null,
-        array $keys = null
+        array $mapping = null
     ): SelectOptions {
         // data prepares
         if (is_string($data)) {
@@ -34,15 +34,15 @@ class ConfigHelper
         unset($item);
 
         // keys prepares
-        $defaultKeys = [
+        $defaultMapping = [
             'value' => null, 'title' => 'title', 'optgroup' => 'optgroup', 'attributes' => 'attributes', 'is_actual' => 'is_actual'
         ];
-        $keys = array_replace($defaultKeys, (array) $keys);
+        $mapping = array_replace($defaultMapping, (array) $mapping);
 
         // Handle
         $result = [];
-        $this->buildSelect($result, (array) $prepends, [], [], $defaultKeys);
-        $this->buildSelect($result, $data, $conditions, $selected, $keys);
+        $this->buildSelect($result, (array) $prepends, [], [], $defaultMapping);
+        $this->buildSelect($result, $data, $conditions, $selected, $mapping);
 
         return new SelectOptions($result, $selected);
     }
@@ -172,14 +172,14 @@ class ConfigHelper
      * @param iterable $data
      * @param array $conditions
      * @param array $selected
-     * @param array $keys
+     * @param array $mapping
      * @return void
      */
-    private function buildSelect(array &$result, iterable $data, ?array $conditions, array $selected, array $keys): void
+    private function buildSelect(array &$result, iterable $data, ?array $conditions, array $selected, array $mapping): void
     {
         foreach ($data as $key => $item) {
-            if ($keys['value']) {
-                $value = $item[$keys['value']];
+            if ($mapping['value']) {
+                $value = $item[$mapping['value']];
             } elseif ($item instanceof \Illuminate\Database\Eloquent\Model) {
                 $value = $item[$item->getKeyName()];
             } else {
@@ -191,15 +191,15 @@ class ConfigHelper
                     continue;
                 }
 
-                if ($keys['is_actual'] && isset($item[$keys['is_actual']]) && !$item[$keys['is_actual']]) {
+                if ($mapping['is_actual'] && isset($item[$mapping['is_actual']]) && !$item[$mapping['is_actual']]) {
                     continue;
                 }
             }
 
-            $option = ['title' => trans($item[$keys['title']]), 'attributes' => ($item[$keys['attributes']] ?? [])];
+            $option = ['title' => trans($item[$mapping['title']]), 'attributes' => ($item[$mapping['attributes']] ?? [])];
 
-            if ($keys['optgroup'] && isset($item[$keys['optgroup']])) {
-                $result[trans($item[$keys['optgroup']])][$value] = $option;
+            if ($mapping['optgroup'] && isset($item[$mapping['optgroup']])) {
+                $result[trans($item[$mapping['optgroup']])][$value] = $option;
             } else {
                 $result[$value] = $option;
             }
