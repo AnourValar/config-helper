@@ -8,19 +8,13 @@ class ConfigHelper
      * Prepares data for select's options
      *
      * @param mixed $data
-     * @param array $prepends
-     * @param array $conditions
      * @param mixed $selected
+     * @param array $conditions
      * @param array $mapping
      * @return \AnourValar\ConfigHelper\SelectOptions
      */
-    public function toSelect(
-        $data,
-        array $prepends = null,
-        array $conditions = null,
-        $selected = null,
-        array $mapping = null
-    ): SelectOptions {
+    public function toSelect($data, $selected = null, array $conditions = null, array $mapping = null): SelectOptions
+    {
         // data prepares
         if (is_string($data)) {
             $data = config($data);
@@ -33,18 +27,11 @@ class ConfigHelper
         }
         unset($item);
 
-        // keys prepares
-        $defaultMapping = [
-            'value' => null, 'title' => 'title', 'optgroup' => 'optgroup', 'attributes' => 'attributes', 'is_actual' => 'is_actual'
-        ];
-        $mapping = array_replace($defaultMapping, (array) $mapping);
+        // mapping prepares
+        $mapping = array_replace(config('config_helper.default_mapping'), (array) $mapping);
 
         // Handle
-        $result = [];
-        $this->buildSelect($result, (array) $prepends, [], [], $defaultMapping);
-        $this->buildSelect($result, $data, $conditions, $selected, $mapping);
-
-        return new SelectOptions($result, $selected);
+        return new SelectOptions($this->buildSelect($data, $selected, $conditions, $mapping), $selected);
     }
 
     /**
@@ -168,15 +155,16 @@ class ConfigHelper
     }
 
     /**
-     * @param array $result
      * @param iterable $data
-     * @param array $conditions
      * @param array $selected
+     * @param array $conditions
      * @param array $mapping
-     * @return void
+     * @return array
      */
-    private function buildSelect(array &$result, iterable $data, ?array $conditions, array $selected, array $mapping): void
+    private function buildSelect(iterable $data, array $selected, ?array $conditions, array $mapping): array
     {
+        $result = [];
+
         foreach ($data as $key => $item) {
             if ($mapping['value']) {
                 $value = $item[$mapping['value']];
@@ -196,7 +184,12 @@ class ConfigHelper
                 }
             }
 
-            $option = ['title' => trans($item[$mapping['title']]), 'attributes' => ($item[$mapping['attributes']] ?? [])];
+            if (! is_scalar($item)) {
+                $title = $item[$mapping['title']];
+            } else {
+                $title = $item;
+            }
+            $option = ['title' => trans($title), 'attributes' => ($item[$mapping['attributes']] ?? [])];
 
             if ($mapping['optgroup'] && isset($item[$mapping['optgroup']])) {
                 $result[trans($item[$mapping['optgroup']])][$value] = $option;
@@ -204,6 +197,8 @@ class ConfigHelper
                 $result[$value] = $option;
             }
         }
+
+        return $result;
     }
 
     /**

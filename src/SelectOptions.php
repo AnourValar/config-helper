@@ -62,6 +62,8 @@ class SelectOptions implements \Iterator
     }
 
     /**
+     * Compatibility with laravelcollective/html
+     *
      * @see \Iterator
      */
     public function rewind()
@@ -93,6 +95,8 @@ class SelectOptions implements \Iterator
     }
 
     /**
+     * Compatibility with laravelcollective/html
+     *
      * @see \Iterator
      */
     public function key()
@@ -101,6 +105,8 @@ class SelectOptions implements \Iterator
     }
 
     /**
+     * Compatibility with laravelcollective/html
+     *
      * @see \Iterator
      */
     public function next()
@@ -109,6 +115,8 @@ class SelectOptions implements \Iterator
     }
 
     /**
+     * Compatibility with laravelcollective/html
+     *
      * @see \Iterator
      */
     public function valid()
