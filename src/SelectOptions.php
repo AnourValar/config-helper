@@ -142,8 +142,8 @@ class SelectOptions implements \Iterator
         }
         unset($attributeValue);
 
-        $option['title'] = e($option['title']);
+        $option['title'] = str_replace(['<', '>'], ['&lt;', '&gt;'], $option['title']);
 
-        return sprintf('<option %s>%s</option>', implode(' ', $option['attributes']), e($option['title']));
+        return sprintf('<option %s>%s</option>', implode(' ', $option['attributes']), $option['title']);
     }
 }
