@@ -7,6 +7,16 @@ use Illuminate\Support\ServiceProvider;
 class ConfigHelperServiceProvider extends ServiceProvider
 {
     /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+
+    }
+
+    /**
      * Bootstrap any application services.
      *
      * @return void
@@ -16,15 +26,5 @@ class ConfigHelperServiceProvider extends ServiceProvider
         // config
         $this->mergeConfigFrom(__DIR__.'/../resources/config/config_helper.php', 'config_helper');
         $this->publishes([ __DIR__.'/../resources/config/config_helper.php' => config_path('config_helper.php')], 'config');
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-
     }
 }

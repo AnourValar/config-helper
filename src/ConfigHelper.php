@@ -92,25 +92,21 @@ class ConfigHelper
     }
 
     /**
-     * Gets config with localized titles
+     * Gets config with localized titles & filtered keys
      *
      * @param mixed $config
-     * @param array $transKeys
      * @param array $visibleKeys
+     * @param mixed $transKeys
      * @return mixed
      */
-    public function trans($config, array $transKeys, array $visibleKeys = [])
+    public function publish($config, array $visibleKeys, $transKeys = null)
     {
         if (is_string($config)) {
             $config = config($config);
         }
 
-        if (!is_array($config)) {
-            return $config;
-        }
-
-        $visibleKeys = array_unique(array_merge($transKeys, $visibleKeys));
-        return $this->localizeRecursive($config, $transKeys, $visibleKeys);
+        $transKeys = (array) $transKeys;
+        return $this->publishRecursive($config, array_unique(array_merge($visibleKeys, $transKeys)), $transKeys);
     }
 
     /**
@@ -203,21 +199,28 @@ class ConfigHelper
 
     /**
      * @param array $config
-     * @param array $transKeys
      * @param array $visibleKeys
-     * @param integer $level
+     * @param array $transKeys
      * @return array
      */
-    private function localizeRecursive(array $config, array $transKeys, $visibleKeys, int $level = 1): array
+    private function publishRecursive(array $config, array $visibleKeys, array $transKeys): array
     {
+        $hasVisible = false;
+        foreach ($config as $key => $item) {
+            if (in_array($key, $visibleKeys, true) || !$visibleKeys) {
+                $hasVisible = true;
+                break;
+            }
+        }
+
         foreach ($config as $key => &$item) {
-            if ($level == 2 && !in_array($key, $visibleKeys, true)) {
+            if ($hasVisible && !in_array($key, $visibleKeys, true)) {
                 unset($config[$key]);
                 continue;
             }
 
             if (is_array($item)) {
-                $item = $this->localizeRecursive($item, $transKeys, $visibleKeys, ($level + 1));
+                $item = $this->publishRecursive($item, $visibleKeys, $transKeys);
             } elseif (in_array($key, $transKeys, true) && is_string($item)) {
                 $item = trans($item);
             }
