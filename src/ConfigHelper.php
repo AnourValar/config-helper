@@ -64,7 +64,7 @@ class ConfigHelper
      *
      * @param mixed $config
      * @param array $conditions
-     * @param boolean $strict
+     * @param bool $strict
      * @throws \LogicException
      * @return mixed
      */
@@ -115,11 +115,11 @@ class ConfigHelper
      * @param array $conditions
      * @param mixed $item
      * @param mixed $key
-     * @return boolean
+     * @return bool
      */
     public function conditionsPasses(?array $conditions, $item, $key): bool
     {
-        foreach ((array)$conditions as $field => $value) {
+        foreach ((array) $conditions as $field => $value) {
             if (is_numeric($field)) {
                 $curr = $key;
             } else {
@@ -138,10 +138,17 @@ class ConfigHelper
                 continue;
             }
 
-            $curr = (array)$curr;
-            $value = (array)$value;
-            if (array_intersect(array_keys($curr), $value) || array_intersect($curr, $value)) {
-                continue;
+            $curr = (array) $curr;
+            $value = (array) $value;
+            foreach ($curr as $single) {
+                if (in_array($single, $value, true)) {
+                    continue 2;
+                }
+            }
+            foreach (array_keys($curr) as $single) {
+                if (in_array($single, $value, true)) {
+                    continue 2;
+                }
             }
 
             return false;

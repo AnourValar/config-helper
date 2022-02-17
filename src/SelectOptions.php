@@ -15,7 +15,7 @@ class SelectOptions implements \Iterator
     private $keys;
 
     /**
-     * @var integer
+     * @var int
      */
     private $position = 0;
 
