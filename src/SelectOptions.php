@@ -66,7 +66,7 @@ class SelectOptions implements \Iterator
      *
      * @see \Iterator
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -76,7 +76,7 @@ class SelectOptions implements \Iterator
      *
      * @see \Iterator
      */
-    public function current()
+    public function current(): mixed
     {
         $item = $this->data[$this->keys[$this->position]];
 
@@ -99,7 +99,7 @@ class SelectOptions implements \Iterator
      *
      * @see \Iterator
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->keys[$this->position];
     }
@@ -109,7 +109,7 @@ class SelectOptions implements \Iterator
      *
      * @see \Iterator
      */
-    public function next()
+    public function next(): void
     {
         $this->position++;
     }
@@ -119,7 +119,7 @@ class SelectOptions implements \Iterator
      *
      * @see \Iterator
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->keys[$this->position]);
     }

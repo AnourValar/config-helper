@@ -170,7 +170,7 @@ class ConfigHelper
 
         foreach ($data as $key => $item) {
             if ($mapping['value']) {
-                $value = $item[$mapping['value']];
+                $value = $this->extractMapper($item, $mapping['value'], true);
             } elseif ($item instanceof \Illuminate\Database\Eloquent\Model) {
                 $value = $item[$item->getKeyName()];
             } else {
@@ -182,26 +182,57 @@ class ConfigHelper
                     continue;
                 }
 
-                if ($mapping['is_actual'] && isset($item[$mapping['is_actual']]) && !$item[$mapping['is_actual']]) {
-                    continue;
+                if ($mapping['is_actual']) {
+                    $isActual = $this->extractMapper($item, $mapping['is_actual'], false);
+
+                    if (isset($isActual) && !$isActual) {
+                        continue;
+                    }
                 }
             }
 
             if (! is_scalar($item)) {
-                $title = $item[$mapping['title']];
+                $title = $this->extractMapper($item, $mapping['title'], true);
             } else {
                 $title = $item;
             }
-            $option = ['title' => trans($title), 'attributes' => ($item[$mapping['attributes']] ?? [])];
 
-            if ($mapping['optgroup'] && isset($item[$mapping['optgroup']])) {
-                $result[trans($item[$mapping['optgroup']])][$value] = $option;
+            $option = [
+                'title' => trans($title),
+                'attributes' => (array) $this->extractMapper($item, $mapping['attributes'], false),
+            ];
+
+            if ($mapping['optgroup'] && $optgroup = $this->extractMapper($item, $mapping['optgroup'], false)) {
+                $result[trans($optgroup)][$value] = $option;
             } else {
                 $result[$value] = $option;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param mixed $item
+     * @param string $mapper
+     * @param bool $strict
+     * @return mixed
+     */
+    private function extractMapper(mixed $item, string $mapper, bool $strict): mixed
+    {
+        if (isset($item[$mapper])) {
+            return $item[$mapper];
+        }
+
+        foreach (explode('.', $mapper) as $part) {
+            if (! $strict) {
+                $item = ($item[$part] ?? null);
+            } else {
+                $item = $item[$part];
+            }
+        }
+
+        return $item;
     }
 
     /**
