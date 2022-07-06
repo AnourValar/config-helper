@@ -13,7 +13,8 @@ class ConfigHelperServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
+        // config
+        $this->mergeConfigFrom(__DIR__.'/../resources/config/config_helper.php', 'config_helper');
     }
 
     /**
@@ -24,7 +25,6 @@ class ConfigHelperServiceProvider extends ServiceProvider
     public function boot()
     {
         // config
-        $this->mergeConfigFrom(__DIR__.'/../resources/config/config_helper.php', 'config_helper');
         $this->publishes([ __DIR__.'/../resources/config/config_helper.php' => config_path('config_helper.php')], 'config');
     }
 }
