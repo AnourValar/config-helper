@@ -92,6 +92,26 @@ class ConfigHelper
     }
 
     /**
+     * Gets value from a singleton-key of config
+     *
+     * @param string $config
+     * @param array $conditions
+     * @param string $path
+     * @param bool $strict
+     * @return mixed
+     */
+    public function value(string $config, ?array $conditions = [], string $path = null, bool $strict = true)
+    {
+        $key = $this->key($config, $conditions, $strict);
+
+        if (isset($path)) {
+            return config("$config.$key.$path");
+        }
+
+        return config("$config.$key");
+    }
+
+    /**
      * Gets config with localized titles & filtered keys
      *
      * @param mixed $config
