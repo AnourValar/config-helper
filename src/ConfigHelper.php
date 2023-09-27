@@ -143,7 +143,10 @@ class ConfigHelper
             if (is_numeric($field)) {
                 $curr = $key;
             } else {
-                $curr = $item[$field] ?? null;
+                $curr = $item;
+                foreach (explode('.', $field) as $subField) {
+                    $curr = $curr[$subField] ?? null;
+                }
             }
 
             if ($value === true && $curr) {

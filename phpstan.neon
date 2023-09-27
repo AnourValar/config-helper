@@ -8,9 +8,7 @@ parameters:
 
     ignoreErrors:
 
-
     excludePaths:
-
 
     checkFunctionNameCase: true
     checkInternalClassCaseSensitivity: true
