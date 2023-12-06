@@ -263,6 +263,7 @@ class ConfigHelper
      * @param array $visibleKeys
      * @param array $transKeys
      * @return array
+     * @psalm-suppress UnusedForeachValue
      */
     private function publishRecursive(array $config, array $visibleKeys, array $transKeys): array
     {
