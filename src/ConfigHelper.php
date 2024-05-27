@@ -117,12 +117,21 @@ class ConfigHelper
      * @param mixed $config
      * @param array $visibleKeys
      * @param mixed $transKeys
+     * @param array|null $conditions
      * @return mixed
      */
-    public function publish($config, array $visibleKeys, $transKeys = null)
+    public function publish($config, array $visibleKeys, $transKeys = null, ?array $conditions = [])
     {
         if (is_string($config)) {
             $config = config($config);
+        }
+
+        if ($conditions) {
+            foreach ($config as $key => $value) {
+                if (! $this->conditionsPasses($conditions, $value, $key)) {
+                    unset($config[$key]);
+                }
+            }
         }
 
         $transKeys = (array) $transKeys;
