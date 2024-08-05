@@ -35,7 +35,7 @@ class ConfigHelper
     }
 
     /**
-     * Gets filtered list of config keys
+     * Get a filtered list of the config keys
      *
      * @param mixed $config
      * @param array $conditions
@@ -60,7 +60,7 @@ class ConfigHelper
     }
 
     /**
-     * Gets a singleton-key of config
+     * Get a singleton-key of the config
      *
      * @param mixed $config
      * @param array $conditions
@@ -80,7 +80,7 @@ class ConfigHelper
     }
 
     /**
-     * Gets first key of config
+     * Get a first key of the config
      *
      * @param mixed $config
      * @param array $conditions
@@ -92,7 +92,22 @@ class ConfigHelper
     }
 
     /**
-     * Gets value from a singleton-key of config
+     * Get a random key of the config
+     *
+     * @param mixed $config
+     * @param array $conditions
+     * @return mixed
+     */
+    public function randomKey($config, ?array $conditions = [])
+    {
+        $keys = $this->keys($config, $conditions);
+
+        shuffle($keys);
+        return $keys[0];
+    }
+
+    /**
+     * Get a value from a singleton-key of the config
      *
      * @param string $config
      * @param array $conditions
@@ -112,7 +127,7 @@ class ConfigHelper
     }
 
     /**
-     * Gets config with localized titles & filtered keys
+     * Get a config with localized titles & filtered keys
      *
      * @param mixed $config
      * @param array $visibleKeys
