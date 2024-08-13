@@ -9,11 +9,11 @@ class ConfigHelper
      *
      * @param mixed $data
      * @param mixed $selected
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @param array $mapping
      * @return \AnourValar\ConfigHelper\SelectOptions
      */
-    public function toSelect($data, $selected = null, array $conditions = null, array $mapping = null): SelectOptions
+    public function toSelect($data, $selected = null, array|callable|null $conditions = [], array $mapping = null): SelectOptions
     {
         // data prepares
         if (is_string($data)) {
@@ -38,10 +38,10 @@ class ConfigHelper
      * Get a filtered list of the config keys
      *
      * @param mixed $config
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @return array
      */
-    public function keys($config, ?array $conditions = []): array
+    public function keys($config, array|callable|null $conditions = []): array
     {
         if (is_string($config)) {
             $config = config($config);
@@ -63,12 +63,12 @@ class ConfigHelper
      * Get a singleton-key of the config
      *
      * @param mixed $config
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @param bool $strict
      * @throws \LogicException
      * @return mixed
      */
-    public function key($config, ?array $conditions = [], bool $strict = true)
+    public function key($config, array|callable|null $conditions = [], bool $strict = true)
     {
         $result = $this->keys($config, $conditions);
 
@@ -83,10 +83,10 @@ class ConfigHelper
      * Get a first key of the config
      *
      * @param mixed $config
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @return mixed
      */
-    public function firstKey($config, ?array $conditions = [])
+    public function firstKey($config, array|callable|null $conditions = [])
     {
         return $this->key($config, $conditions, false);
     }
@@ -95,10 +95,10 @@ class ConfigHelper
      * Get a random key of the config
      *
      * @param mixed $config
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @return mixed
      */
-    public function randomKey($config, ?array $conditions = [])
+    public function randomKey($config, array|callable|null $conditions = [])
     {
         $keys = $this->keys($config, $conditions);
 
@@ -110,12 +110,12 @@ class ConfigHelper
      * Get a value from a singleton-key of the config
      *
      * @param string $config
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @param string $path
      * @param bool $strict
      * @return mixed
      */
-    public function value(string $config, ?array $conditions = [], string $path = null, bool $strict = true)
+    public function value(string $config, array|callable|null $conditions = [], string $path = null, bool $strict = true)
     {
         $key = $this->key($config, $conditions, $strict);
 
@@ -132,10 +132,10 @@ class ConfigHelper
      * @param mixed $config
      * @param array $visibleKeys
      * @param mixed $transKeys
-     * @param array|null $conditions
+     * @param array|callable|null $conditions
      * @return mixed
      */
-    public function publish($config, array $visibleKeys, $transKeys = null, ?array $conditions = [])
+    public function publish($config, array $visibleKeys, $transKeys = null, array|callable|null $conditions = [])
     {
         if (is_string($config)) {
             $config = config($config);
@@ -156,13 +156,17 @@ class ConfigHelper
     /**
      * Check if conditions passed
      *
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @param mixed $item
      * @param mixed $key
      * @return bool
      */
-    public function conditionsPasses(?array $conditions, $item, $key): bool
+    public function conditionsPasses(array|callable|null $conditions, $item, $key): bool
     {
+        if (is_callable($conditions)) {
+            return $conditions($item, $key);
+        }
+
         foreach ((array) $conditions as $field => $value) {
             if (is_numeric($field)) {
                 $curr = $key;
@@ -205,13 +209,35 @@ class ConfigHelper
     }
 
     /**
+     * Check if an config's array has a specific value
+     *
+     * @param mixed $config
+     * @param mixed $value
+     * @return bool
+     */
+    public function hasItem($config, $value): bool
+    {
+        if (is_string($config)) {
+            $config = config($config);
+        }
+
+        foreach ((array) $config as $item) {
+            if ($item === $value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param iterable $data
      * @param array $selected
-     * @param array $conditions
+     * @param array|callable|null $conditions
      * @param array $mapping
      * @return array
      */
-    private function buildSelect(iterable $data, array $selected, ?array $conditions, array $mapping): array
+    private function buildSelect(iterable $data, array $selected, array|callable|null $conditions, array $mapping): array
     {
         $result = [];
 
