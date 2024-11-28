@@ -10,10 +10,10 @@ class ConfigHelper
      * @param mixed $data
      * @param mixed $selected
      * @param array|callable|null $conditions
-     * @param array $mapping
+     * @param array|null $mapping
      * @return \AnourValar\ConfigHelper\SelectOptions
      */
-    public function toSelect($data, $selected = null, array|callable|null $conditions = [], array $mapping = null): SelectOptions
+    public function toSelect($data, $selected = null, array|callable|null $conditions = [], ?array $mapping = null): SelectOptions
     {
         // data prepares
         if (is_string($data)) {
@@ -111,11 +111,11 @@ class ConfigHelper
      *
      * @param string $config
      * @param array|callable|null $conditions
-     * @param string $path
+     * @param string|null $path
      * @param bool $strict
      * @return mixed
      */
-    public function value(string $config, array|callable|null $conditions = [], string $path = null, bool $strict = true)
+    public function value(string $config, array|callable|null $conditions = [], ?string $path = null, bool $strict = true)
     {
         $key = $this->key($config, $conditions, $strict);
 
