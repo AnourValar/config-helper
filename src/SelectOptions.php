@@ -133,7 +133,7 @@ class SelectOptions implements \Iterator
     {
         $option['attributes']['value'] = $value;
 
-        if (in_array((string) $value, $this->selected, true)) {
+        if (in_array(trim((string) $value), $this->selected, true)) {
             $option['attributes']['selected'] = 'selected';
         }
 

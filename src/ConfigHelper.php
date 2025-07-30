@@ -23,7 +23,7 @@ class ConfigHelper
         // selected prepares
         $selected = (array) $selected;
         foreach ($selected as &$item) {
-            $item = (string) $item;
+            $item = trim((string) $item);
         }
         unset($item);
 
@@ -250,7 +250,7 @@ class ConfigHelper
                 $value = $key;
             }
 
-            if (! in_array((string) $value, $selected, true)) {
+            if (! in_array(trim((string) $value), $selected, true)) {
                 if (! $this->conditionsPasses($conditions, $item, $value)) {
                     continue;
                 }
